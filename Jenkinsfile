@@ -48,10 +48,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            // Optional: Add steps to clean up after the pipeline run
-        }
-    }
 }
