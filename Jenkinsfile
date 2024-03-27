@@ -53,6 +53,7 @@ pipeline {
                     // CD, run kustomize, commit, and push changes
                     sh """
                     cd /jenkins/argocd/webpage && \\
+                    git pull
                     kustomize edit set image ${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER} && \\
                     git add . && \\
                     git commit -am "Update image tag to ${BUILD_NUMBER}" && \\
