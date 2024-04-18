@@ -1,7 +1,8 @@
-properties([[$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false], parameters([run(description: 'Run parameters', filter: 'ALL', name: 'application_name', projectName: 'webpage')])])
 pipeline {
     agent any
-
+    parameters {
+        string defaultValue: '', description: 'Pass the application name', name: 'application_name', trim: false
+    }
     environment {
         // Define the GCP project ID, Artifact Registry location, and repository name
         GCP_PROJECT_ID = 'fabhotels-development'
