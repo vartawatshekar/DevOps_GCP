@@ -4,7 +4,14 @@ pipeline {
         string(defaultValue: '', description: 'What is my Project ID?', name: 'GCP_PROJECT_ID', trim: false)
         string(defaultValue: '', description: 'What is my Artifact Repository Name?', name: 'ARTIFACT_REGISTRY_REPOSITORY', trim: false)
         string(defaultValue: '', description: 'What is my Image Name?', name: 'IMAGE_NAME', trim: false)
+        string(defaultValue: '', description: 'What is my Environment?', name: 'ENV_NAME', trim: false)
 
+    }
+
+    environment {
+        // Define the GCP project ID, Artifact Registry location, and repository name
+        APPLICATION_NAME = ${ARTIFACT_REGISTRY_REPOSITORY}
+        DEPLOYMENT_IMAGE = 'asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}'
     }
 
     stages {
@@ -49,10 +56,10 @@ pipeline {
                 script {
                     // CD, run kustomize, commit, and push changes
                     sh """
-                    echo ${ARTIFACT_REGISTRY_REPOSITORY}
-                    cd /jenkins/argocd/webpage && \\
+                    cd /jenkins/argo-cd-configs/patch && \\
                     git pull && \\
-                    kustomize edit set image asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER} && \\
+                    sed "s/\${APPLICATION_NAME}/$APPLICATION_NAME/g; s/\${DEPLOYMENT_IMAGE}/$DEPLOYMENT_IMAGE/g; s/\${ENV_NAME}/$ENV_NAME/g" vars.txt > ${APPLICATION_NAM}_vars.txt && \\
+                    ./update_patch.sh /jenkins/argo-cd-configs/${APPLICATION_NAME}/overlays/${ENV_NAME} kustomization.yaml deployment_patch.json hpa_patch.json service_patch.json ${APPLICATION_NAM}_vars.txt && \\
                     git add . && \\
                     git commit -am "Update image tag to ${BUILD_NUMBER}" && \\
                     git push origin HEAD:main
