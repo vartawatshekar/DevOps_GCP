@@ -1,3 +1,4 @@
+properties([[$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false], parameters([run(description: 'Run parameters', filter: 'ALL', name: 'application_name', projectName: 'webpage')])])
 pipeline {
     agent any
 
@@ -52,6 +53,7 @@ pipeline {
                 script {
                     // CD, run kustomize, commit, and push changes
                     sh """
+                    echo ${application_name}
                     cd /jenkins/argocd/webpage && \\
                     git pull
                     kustomize edit set image ${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER} && \\
