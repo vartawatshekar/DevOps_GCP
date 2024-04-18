@@ -1,15 +1,10 @@
 pipeline {
     agent any
     parameters {
-        string defaultValue: '', description: 'Pass the application name', name: 'application_name', trim: false
-    }
-    environment {
-        // Define the GCP project ID, Artifact Registry location, and repository name
-        GCP_PROJECT_ID = 'fabhotels-development'
-        ARTIFACT_REGISTRY_LOCATION = 'asia-south1'
-        ARTIFACT_REGISTRY_REPOSITORY = 'webpage'
-        IMAGE_NAME = 'webapp'
-        IMAGE_TAG = 'latest' // or dynamically set based on your versioning scheme
+        string(defaultValue: '', description: 'What is my Project ID?', name: 'GCP_PROJECT_ID', trim: false)
+        string(defaultValue: '', description: 'What is my Artifact Repository Name?', name: 'ARTIFACT_REGISTRY_REPOSITORY', trim: false)
+        string(defaultValue: '', description: 'What is my Image Name?', name: 'IMAGE_NAME', trim: false)
+
     }
 
     stages {
@@ -25,7 +20,7 @@ pipeline {
                 script {
                     // Authenticate to GCP
                     // Make sure Jenkins has configured gcloud CLI and has appropriate permissions
-                    sh "gcloud auth configure-docker ${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev"
+                    sh "gcloud auth configure-docker asia-south1-docker.pkg.dev"
                 }
             }
         }
@@ -34,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image with the appropriate tag
-                    def imageName = "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                    def imageName = "asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}"
                     docker.build(imageName)
                 }
             }
@@ -44,7 +39,7 @@ pipeline {
             steps {
                 script {
                     // Push the image to GCP Artifact Registry
-                    def imageName = "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                    def imageName = "asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}"
                     docker.image(imageName).push()
                 }
             }
@@ -54,10 +49,10 @@ pipeline {
                 script {
                     // CD, run kustomize, commit, and push changes
                     sh """
-                    echo ${application_name}
+                    echo ${ARTIFACT_REGISTRY_REPOSITORY}
                     cd /jenkins/argocd/webpage && \\
-                    git pull
-                    kustomize edit set image ${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER} && \\
+                    git pull && \\
+                    kustomize edit set image asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER} && \\
                     git add . && \\
                     git commit -am "Update image tag to ${BUILD_NUMBER}" && \\
                     git push origin HEAD:main
