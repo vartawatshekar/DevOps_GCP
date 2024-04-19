@@ -55,7 +55,7 @@ pipeline {
         stage('Update Kustomization and Push') {
             steps {
                 script {
-                     sh ""
+                     sh """
                      cd /jenkins/argo-cd-configs &&
                      git pull &&
                      cd patch &&
