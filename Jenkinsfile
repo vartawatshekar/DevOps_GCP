@@ -61,7 +61,7 @@ pipeline {
                     cd /jenkins/argo-cd-configs && \\
                     git pull && \\
                     cd patch && \\
-                    sed 's/\${APPLICATION_NAME}/$APPLICATION_NAME/g; s/\${DEPLOYMENT_IMAGE}/$escapedDeploymentImage/g; s/\${ENV_NAME}/$ENV_NAME/g' vars.txt > ${APPLICATION_NAME}_vars.txt && \\
+                    sed 's|\\${APPLICATION_NAME}|$APPLICATION_NAME|g; s|\\${DEPLOYMENT_IMAGE}|asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}|g; s|\\${ENV_NAME}|$ENV_NAME|g' vars.txt > ${APPLICATION_NAME}_vars.txt && \\
                     ./update_patch.sh /jenkins/argo-cd-configs/${APPLICATION_NAME}/overlays/${ENV_NAME} kustomization.yaml deployment_patch.json hpa_patch.json service_patch.json ${APPLICATION_NAME}_vars.txt && \\
                     git add . && \\
                     git commit -am "Update image tag to ${BUILD_NUMBER}" && \\
