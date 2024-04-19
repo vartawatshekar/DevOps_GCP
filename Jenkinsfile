@@ -54,8 +54,6 @@ pipeline {
         stage('Update Kustomization and Push') {
             steps {
                 script {
-                    // Define the escapedDeploymentImage variable in Groovy
-                    def escapedDeploymentImage = DEPLOYMENT_IMAGE.replaceAll('/', '\\/')
                     // CD, run kustomize, commit, and push changes
                     sh """
                     cd /jenkins/argo-cd-configs && \\
