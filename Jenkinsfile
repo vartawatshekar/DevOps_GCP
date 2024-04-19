@@ -64,6 +64,7 @@ pipeline {
                           s|\\\${DEPLOYMENT_TAG}|${BUILD_NUMBER}|g; \
                           s|\\\${ENV_NAME}|${ENV_NAME}|g" vars.txt > ${APPLICATION_NAME}_vars.txt &&
                      ./update_patch.sh /jenkins/argo-cd-configs/${APPLICATION_NAME}/overlays/${ENV_NAME} kustomization.yaml deployment_patch.json hpa_patch.json service_patch.json ${APPLICATION_NAME}_vars.txt &&
+                     cd /jenkins/argo-cd-configs &&
                      git add . &&
                      git commit -am "Update image tag to ${BUILD_NUMBER}" &&
                      git push origin HEAD:main
