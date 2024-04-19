@@ -56,8 +56,9 @@ pipeline {
                 script {
                     // CD, run kustomize, commit, and push changes
                     sh """
-                    cd /jenkins/argo-cd-configs/patch && \\
+                    cd /jenkins/argo-cd-configs && \\
                     git pull && \\
+                    cd patch && \\
                     sed "s/\${APPLICATION_NAME}/$APPLICATION_NAME/g; s/\${DEPLOYMENT_IMAGE}/$DEPLOYMENT_IMAGE/g; s/\${ENV_NAME}/$ENV_NAME/g" vars.txt > ${APPLICATION_NAME}_vars.txt && \\
                     ./update_patch.sh /jenkins/argo-cd-configs/${APPLICATION_NAME}/overlays/${ENV_NAME} kustomization.yaml deployment_patch.json hpa_patch.json service_patch.json ${APPLICATION_NAME}_vars.txt && \\
                     git add . && \\
