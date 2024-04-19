@@ -11,7 +11,8 @@ pipeline {
     environment {
         // Define the GCP project ID, Artifact Registry location, and repository name
         APPLICATION_NAME = '${ARTIFACT_REGISTRY_REPOSITORY}'
-        DEPLOYMENT_IMAGE = 'asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}:${BUILD_NUMBER}'
+        DEPLOYMENT_IMAGE = 'asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}'
+        DEPLOYMENT_TAG = '${BUILD_NUMBER}'
     }
 
     stages {
