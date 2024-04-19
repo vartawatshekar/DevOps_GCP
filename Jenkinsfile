@@ -55,16 +55,7 @@ pipeline {
         stage('Update Kustomization and Push') {
             steps {
                 script {
-                     sh """
-                     echo "Debugging variables:"
-                     echo "APPLICATION_NAME = ${APPLICATION_NAME}"
-                     echo "DEPLOYMENT_IMAGE = ${DEPLOYMENT_IMAGE}"
-                     echo "GCP_PROJECT_ID = ${GCP_PROJECT_ID}"
-                     echo "ARTIFACT_REGISTRY_REPOSITORY = ${ARTIFACT_REGISTRY_REPOSITORY}"
-                     echo "IMAGE_NAME = ${IMAGE_NAME}"
-                     echo "BUILD_NUMBER = ${BUILD_NUMBER}"
-                     echo "ENV_NAME = ${ENV_NAME}"
-
+                     sh ""
                      cd /jenkins/argo-cd-configs &&
                      git pull &&
                      cd patch &&
@@ -72,8 +63,6 @@ pipeline {
                           s|\\\${DEPLOYMENT_IMAGE}|asia-south1-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}|g; \
                           s|\\\${DEPLOYMENT_TAG}|${BUILD_NUMBER}|g; \
                           s|\\\${ENV_NAME}|${ENV_NAME}|g" vars.txt > ${APPLICATION_NAME}_vars.txt &&
-                     echo "After sed operation:" &&
-                     cat ${APPLICATION_NAME}_vars.txt &&
                      ./update_patch.sh /jenkins/argo-cd-configs/${APPLICATION_NAME}/overlays/${ENV_NAME} kustomization.yaml deployment_patch.json hpa_patch.json service_patch.json ${APPLICATION_NAME}_vars.txt &&
                      git add . &&
                      git commit -am "Update image tag to ${BUILD_NUMBER}" &&
